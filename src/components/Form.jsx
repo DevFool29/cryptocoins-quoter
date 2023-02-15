@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import useSelectCoin from '../hooks/useSelectCoin'
+import ErrorMessage from './ErrorMessage'
 import { coinsType } from '../data/coinsType'
 import { useEffect, useState } from 'react'
 
@@ -22,7 +23,7 @@ const InputSubmit = styled.input`
   }
 `
 
-const Form = () => {
+const Form = ({ setCoinsSelected }) => {
   // To fill cryptos in a state
   const [cryptos, setCryptos] = useState([])
 
@@ -37,6 +38,8 @@ const Form = () => {
     'Select the crypto of your interest',
     cryptos
   )
+
+  const [errorMessage, setErrorMessage] = useState(false) // To show a message if any select is empty
 
   useEffect(() => {
     const getCryptos = async () => {
@@ -61,10 +64,28 @@ const Form = () => {
     getCryptos()
   }, [])
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if ([coin, crypto].includes('')) {
+      setErrorMessage(true)
+      return
+    }
+
+    const coinsSelected = {
+      coin,
+      crypto,
+    }
+
+    setCoinsSelected(coinsSelected)
+    setErrorMessage(false)
+  }
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <SelectCoin />
       <SelectCrypto />
+      {errorMessage && <ErrorMessage />}
       <InputSubmit type="submit" value="quote now" />
     </form>
   )
